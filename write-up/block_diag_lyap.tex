@@ -1,0 +1,496 @@
+\documentclass{article}
+\usepackage[]{amsmath}
+\usepackage{amsthm} 
+\usepackage{amsbsy}
+% \newtheorem*{remark}{Main Result}
+\usepackage{breqn}
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage[margin=1in]{geometry}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+% \usepackage{todonotes}
+% \usepackage{algorithmic}
+% \usepackage[numbered, framed]{mcode}
+% \newtheorem{remark}{Remark}
+\begin{document}
+
+
+\section{Problem Formulation} % (fold)
+\label{sec:problem_formulation}
+Consider an LTI system $\dot x =Ax$ where A is partitioned into n-by-n blocks (the diagonal blocks are all square but not necessarily of the same size):
+
+\[A=
+\begin{bmatrix}
+  A_{11} & A_{12}    & \dots  & A_{1n} \\
+    A_{21} & A_{22}  & \dots  & A_{2n} \\
+    \vdots & \vdots  & \ddots & \vdots \\
+    A_{n1} & A_{n2}  & \dots  & A_{nn}
+\end{bmatrix},
+\]under what condition does there exist a block-diagonally structured 
+
+\[
+P=
+\begin{bmatrix}
+  P_{1} & 0 & \dots  & 0\\
+  0 & P_{2} & \dots  & 0 \\
+    \vdots  & \vdots & \ddots & \vdots \\
+    0& 0  & \dots  & P_{n}
+\end{bmatrix}
+\] that satisfies the Lyapunov inequality $AP+PA'\prec0$?
+
+
+\section{A Necessary and Sufficient Condition} % (fold)
+\label{sec:generalization}
+The exists a $P$ described in Section \ref{sec:problem_formulation} if and only if there exists a sequence of $\pmb{P_i} \succ 0$, and $\pmb{\gamma_{ij}}>0$, $i,j=1,2,\dots,n, i\neq j$ such that
+\begin{subequations}
+\begin{align}
+&\pmb{\gamma_{ij}}\pmb{\gamma_{ji}}=1 \label{product1}\\
+&A_{ii}\pmb{P_i}+\pmb{P_i}A_{ii}'+\sum\limits_{j \neq i}\pmb{\gamma_{ij}}(A_{ij}A_{ij}'+\pmb{P_i}^2)\prec 0 \label{nsp}
+\end{align}
+
+\end{subequations} are feasible.The matrix power ${P_i}^2=P_i*P_i'$\\
+
+Out of the very computational consideration that motivates this work, we would like to point out that the members in constraint \eqref{product1} are codependet on each other through the nonconvex constraint \eqref{nsp}. One way to mitigate this non-convexity is to fix $\gamma_{ij}=1 \forall i\neq j$, and this comes with additional computational gain of they can be equivalently cast as decoupled LMIs, and better yet, solved by a method based on Riccati equations. We'll discuss these details in Section \ref{sec:computational_consideration}.
+
+On the other hand, from a control theoretic viewpoint, we would also like to emphasize that this is a unifying theorem that unveils the structure of $P$ from fully-parameterized one all the way to a diagnoal one, and it gives a explicit procedure to construct one. In particular, when $A$ is not partitioned, the summation part in \eqref{nsp} goes away, and it reduces to the ordinary Lyapunov inequality; on the other extreme, when $A$ is partitioned into scalar blocks, the constructed $P$ would be a pure diagnoal one. \\
+
+
+
+% start the proof section
+\section{Proof}\label{proof}
+\subsection{Notations} % (fold)
+\label{sub:Notations}
+% subsection notations (end)
+Let us denote $AP+PA'$ as M, so \[
+M=\begin{bmatrix}
+&A_{11}P_1+P_1A_{11}'&A_{12}P_2+P_1A_{21}'&\dots&A_{1n}P_n+P_1A_{n1}'\\
+&A_{21}P_1+P_2A_{12}'&A_{22}P_2+P_2A_{22}'&\dots&A_{2n}P_n+P_2A_{n2}'\\
+&\vdots&\vdots&\ddots&\vdots\\
+&A_{n1}P_1+P_nA_{1n}'&A_{n2}P_2+P_nA_{2n}'&\dots&A_{nn}P_n+P_nA_{nn}'\\
+\end{bmatrix},
+\] and let ${M_k}$ be the k-th leading principal submatrix of ${M}$ in the blocks sense. That is, for example, ${M_1}$ equals $A_{11}P_1+P_1A_{11}'$ instead of the first scalar element in $M$. Also let $\tilde M_{k}$ be the last column-blocks of $M_{k}$ with its last block element deleted, and then $\tilde M_{k}'$ is obviously last column-blocks of $M_{k}$ with its last block element deleted.\\
+
+Additionally, define a sequence of matrices:
+\[N_k=
+\begin{bmatrix}
+ \sum\limits_{j=k+1}^{n}\gamma_{1j}(A_{1j}A_{1j}'+{P_1}^2)\ & 0  & \dots  & 0\\
+  0 &\sum\limits_{j=k+1}^{n}{}\gamma_{2j}(A_{2j}A_{2j}'+{P_2}^2 )&  \dots  & 0 \\
+    \vdots & \vdots  & \ddots & \vdots \\
+    0& 0  & \dots  &\sum\limits_{j=k+1}^{n}{}\gamma_{kj}(A_{kj}A_{kj}'+{P_k}^2)
+\end{bmatrix}
+\]
+for $k=1,2,\dots, n-1$, and ${N_k}=0$ for $k=n$. Let $\bar{N}_{k}$ be ${N}_{k}$ with its last row-blocks and last column-blocks deleted (in other words, the biggest pricipal minor in the block sense). It's obvious then by construction that ${N_k}\succeq0, \forall k$. Finally, denote the sequence of identity matrices as $\{I_i\}$, where $dim(I_i)=dim(P_i)$.
+
+\subsection{Proof of Sufficiency} % (fold)
+\label{sub:proof_of_sufficiency}
+
+% subsection proof_of_sufficiency (end)
+We will use induction to show that $M_k+N_k\prec 0, \forall k$, so then in the terminal case $k=n$, we would arrive at the desired Lyapunov inequality $M=M_n+N_n \prec 0$. For $k=1$, $M_1+N_1\prec0$ is trivially guaranteed by taking $i=1$ in \eqref{nsp}. Suppose $M_k+N_k\prec 0$ for a particular $k\leq n-1$, let us now show that $M_{k+1}+N_{k+1}\prec 0$.\\
+
+First, notice that for $k\leq n-1$, the sequence of $N_{k}$ satisfies this recursive update:
+\begin{equation}\label{recursive}
+N_{k}=n_k+\bar{N}_{k+1},
+\end{equation} where  
+\begin{equation}\label{nkdef}
+  n_k=\begin{bmatrix}
+\gamma_{1(k+1)}(A_{1(k+1)}A_{1(k+1)}'+{P_1}^2)\ & 0  & \dots  & 0\\
+0 &{\gamma_{2(k+1)}(}A_{2(k+1)}A_{2(k+1)}'+{P_2}^2) &  \dots  & 0 \\
+\vdots & \vdots  & \ddots & \vdots \\
+0& 0  & \dots  &{\gamma_{k(k+1)}(}A_{k(k+1)}A_{k(k+1)}'+{P_k}^2)
+\end{bmatrix}
+\end{equation}\\
+
+Notice also that $n_k$ can be expanded as $n_k=L_{k}*S_{k+1}*L_{k}'$ where
+\begin{equation}\label{nk-expanded}
+L_{k}=\begin{bmatrix}
+P_1\ & 0  & \dots  & 0&A_{1(k+1)}\ & 0  & \dots  & 0\\
+0 &P_2&  \dots  & 0 &0 &A_{2(k+1)}&  \dots  & 0 \\
+\vdots & \vdots  & \ddots & \vdots &\vdots & \vdots  & \ddots & \vdots \\
+0& 0  & \dots  &P_k&0& 0  & \dots  &A_{k(k+1)}
+\end{bmatrix}
+\end{equation} and 
+\begin{equation}\label{sk-def}
+S_{k+1}=blkdiag(\gamma_{1(k+1)}I_1,\gamma_{2(k+1)}I_2,\dots,\gamma_{k(k+1)}I_{k},\underbrace{\gamma_{1(k+1)}I_{k+1},\gamma_{2(k+1)}I_{k+1},\dots,\gamma_{k(k+1)}I_{k+1}}_{\text{$k$ such scaled identity matrices}}). 
+\end{equation}
+From the assumption that $M_k+N_k\prec 0$, we then have $M_k+N_k=M_k+L_{k}*S_{k+1}*L_{k}'+\bar{N}_{k+1}\prec 0$. Rearrange the terms:
+\begin{equation}\label{truncated}
+-(M_k+\bar{N}_{k+1})\succ L_{k}*S_{k+1}*L_{k}'
+\end{equation}\\
+
+Next, by Schur complement, constraint \eqref{nsp} with $i=k+1$ is equivalent to:
+\begin{equation}\label{schur1st}
+\begin{aligned}
+&\begin{bmatrix}
+\overbar{Cstr}_{k+1}& T_{k+1}\\
+   \\
+T_{k+1}' &-S_{k+1}\\
+\end{bmatrix}
+\prec 0\\
+\end{aligned}
+\end{equation}where $\overbar{Cstr}_{k+1}=A_{(k+1)(k+1)}P_{k+1}+P_{k+1}A_{(k+1)(k+1)}'+\sum\limits_{j=k+2}^{n}(A_{(k+1)j}A_{(k+1)j}'+P_{k+1}^2)$ is the left hand side of constraint \eqref{nsp} at $i=k+1$ with the summation truncated to be only over indicies $k+2$ to $n$ (as opposed to be over all indices other than $k+1$), $T_{k+1}=[A_{(k+1)1},A_{(k+1)2},\dots, A_{(k+1)k}, \underbrace{P_{k+1},P_{k+1},\dots,P_{k+1}}_{\text{repeat k times}}]$, and $S_{k+1}$ is as defined in \eqref{sk-def} by invoking $\gamma_{ij}{\gamma_{ji}}=1$\\
+
+Use Schur complement on \eqref{schur1st} again, this time from the opposite direction, it is also equivalent to:
+\begin{equation}\label{schur2nd}
+S_{k+1}\succ -T_{k+1}'*\overbar{Cstr}_{k+1}^{-1}*T_{k+1}
+\end{equation}
+
+Because $\{P_i\}\succ 0$, $L_k$ has full row-rank. Therefore, pre- and post-multiplying \eqref{schur2nd} with $L_k$ and $L_k'$ preserves the positive definite order, i.e.:
+\begin{equation}\label{leftrightpreserve}
+\begin{aligned}
+&L_{k}*S_{k+1}*L_{k}'\succ - L_{k}*(T_{k+1}'*\overbar{Cstr}_{k+1}^{-1}*T_{k+1})*L_{k}'
+\end{aligned}
+\end{equation}\\
+Realize that 
+\[L_{k}*T_{k+1}'=\begin{bmatrix}
+&A_{1(k+1)}P_{k+1}+P_{1}A_{(k+1)1}'\\
+&A_{2(k+1)}P_{k+1}+P_{2}A_{(k+1)2}'\\
+&\vdots  \\
+&A_{k(k+1)}P_{k+1}+P_{k}A_{(k+1)k}'
+\end{bmatrix}\] is precisely $\tilde M_{k+1}$, and $T_{k+1}*L_{k}'=\tilde M_{k+1}'$.\\
+
+Finally, combining \eqref{truncated} and \eqref{leftrightpreserve}, we have
+\begin{equation}\label{finalexpanded}
+\begin{aligned}
+&-(M_k+\bar{N}_{k+1})\succ - \tilde M_{k+1}*\overbar{Cstr}_{k+1}*\tilde M_{k+1}'
+\end{aligned}
+\end{equation}
+By again taking Schur complement, this is equivalent to:
+\begin{equation}\label{final}
+\begin{aligned}
+&\begin{bmatrix}
+&M_k+\bar{N}_{k+1}  &\tilde M_{k+1} \\
+\\
+&\tilde M_{k+1}'&\overbar{Cstr}_{k+1}\\
+\end{bmatrix}=M_{k+1}+N_{k+1}\prec 0
+\end{aligned}
+\end{equation}\qed
+
+
+
+
+\subsection{Proof of Necessity} % (fold)
+\label{sub:proof_of_necessity}
+The proof of necessity is essentially the reverse arguing the sufficiency proof. Specifically, for $k=n,n-1,\dots, 1$, we'll show the sequence of the set of matrix inequalities 
+\begin{equation}
+\begin{cases}A_{kk}P_{k}+P_{k}A_{kk}'+\sum\limits_{j\neq k}\gamma_{kj}(A_{kj}A_{kj}'+P_{k}^2)\prec 0&\\
+  A_{ii}P_{i}+P_{i}A_{ii}'+\sum\limits_{j\geq k, j\neq i}^{n}\gamma_{ij}(A_{ij}A_{ij}'+P_{i}^2)\prec 0, & {\forall i<k}
+  \end{cases}
+\end{equation} hold under the additional constraint $\gamma_{ij}\gamma_{ji}=1$. Then at the terminal $k=1$, we'll recover the full set of matrix inequalities \eqref{nsp}.
+
+
+Before we continue, we'll present two useful facts:
+\begin{itemize}
+ \item Fact 1: If $B,C\in \mathbb{S^{+}}^{n\times n}$, then $B\succ C \iff C^{-1}\succ B^{-1}\succ 0$
+\item Fact 2: If $B\in  \mathbb{S^{+}}^{n\times n}$ and $D \in \mathbb{R}^{m\times n}$, then $[B,D]'*([B,D]*[B,D]')^{-1}*[B,D]\preceq I$
+\end{itemize}Both facts can be easily proven by Schur complement argument and will be omitted.
+
+For $k=n$, inequality assossiated with $A_{nn}$ is true since we have the freedom of choosing arbitrary $\gamma_{nj}>0,j\neq n$. The inquality assossiated with $A_{ii},i<n$
+
+First, since $M\succ 0$, we have 
+\begin{equation}\label{}
+\begin{aligned}
+A_{33}{P_3}+{P_3}A_{33}' &\prec (A_{31}{P_1}+{P_3}A_{13}',A_{32}{P_2}+{P_3}A_{23}' )M_2^{-1}(A_{31}{P_1}+{P_3}A_{13}',A_{32}{P_2}+{P_3}A_{23}')'\\
+&=
+\\
+\iff&M_2^{-1}\prec \begin{bmatrix}
+-\gamma_{31}(A_{31}A_{31}'+P_{3}^2)&0\\
+0&-\gamma_{32}(A_{32}A_{32}'+P_{3}^2)
+\end{bmatrix}^{-1}\\
+&=\begin{bmatrix}
+-\gamma_{13}(A_{31}A_{31}'+P_{3}^2)&0\\
+0&-\gamma_{23}(A_{32}A_{32}'+P_{3}^2)
+\end{bmatrix}^{-1}\\
+\end{aligned}
+\end{equation}
+
+It's obvious that $M_{k}\prec0, \forall k$ and $A_{ij}A_{ij}'+P_{i}^2 \succ 0, \forall i, j$, hence, there exists $\gamma_{31}, \gamma_{32} >0$ such that 
+\begin{equation}\label{}
+\begin{aligned}
+&M_{2}\succ \begin{bmatrix}
+-\gamma_{31}(A_{31}A_{31}'+P_{3}^2)&0\\
+0&-\gamma_{32}(A_{32}A_{32}'+P_{3}^2)
+\end{bmatrix}\\
+\iff&M_2^{-1}\prec \begin{bmatrix}
+-\gamma_{31}(A_{31}A_{31}'+P_{3}^2)&0\\
+0&-\gamma_{32}(A_{32}A_{32}'+P_{3}^2)
+\end{bmatrix}^{-1}\\
+&=\begin{bmatrix}
+-\gamma_{13}(A_{31}A_{31}'+P_{3}^2)&0\\
+0&-\gamma_{23}(A_{32}A_{32}'+P_{3}^2)
+\end{bmatrix}^{-1}\\
+\end{aligned}
+\end{equation}
+
+
+
+
+
+
+\section{Computational Details} % (fold)
+\label{sec:computational_consideration}
+% \subsection{LMI formulation} % (fold)
+% \label{sub:lmi_formulation}
+
+% subsection lmi_formulation (end)
+By Schur complement, constraints \eqref{nsp} can be equivalently cast as decoupled LMIs:
+\begin{equation}\label{schur-LMI}
+\begin{bmatrix}
+   A_{ii}\pmb{P_{i}}+\pmb{P_{i}}A_{ii}'+\sum\limits_{j\neq i}A_{ij}A_{ij}'& \sqrt{n-1}\pmb{P_{i}}\\
+   \\
+\sqrt{n-1}\pmb{P_{i}}' &-I_i\\
+\end{bmatrix}
+\prec 0
+\end{equation}
+This comes at the cost of ``inflating'' the decision variable, in that if $P_i$ is an m-by-m matrix, \eqref{schur-LMI} is a 2m-by-2m sized LMI.\\
+
+If no other constraints or cost of the system depend on $P_i$, a much more efficient alternative exists to check the feasibility of \eqref{schur-LMI}. By bounded-real lemma, \eqref{schur-LMI} are feasible if and only if for each $i$, the Riccati equation
+\begin{equation}\label{riccati-eqn}
+A_{ii}\pmb{P_i}+\pmb{P_i}A_{ii}'+\sum\limits_{j \neq i}\pmb{}A_{ij}A_{ij}'+(n-1)\pmb{P_i}\pmb{P_i}=0
+\end{equation} has a unique positive definite solutions $P_{i}^{are}$. That is, $P_{i}^{are}$ is on the boundary of the set of solutions $P_i$ to \eqref{schur-LMI} in which $P_i\succ P_{i}^{are}$. Note that Riccati equations are generally easier to solve than LMIs (when the size are the same), and here, the Riccati \eqref{riccati-eqn} are only half the size of the LMIs'. Therefore, the Riccati approach could potentially offer a even more significant computational advantage, which is the very motivation behind this work.\\
+
+\section{Additional Notes}
+\begin{itemize}
+  \item There is in fact a more general sufficient condition, which is the feasibility of 
+\begin{equation}\label{scaled-nsp}
+A_{ii}\pmb{P_i}+\pmb{P_i}A_{ii}'+\sum\limits_{j \neq i}\pmb{\gamma_{ij}}(A_{ij}A_{ij}'+\pmb{P_i}\pmb{P_i})\prec 0
+\end{equation} subject to $\pmb{P_i} \succ 0$, $\pmb{\gamma_{ij}}>0$, $\pmb{\gamma_{ij}}\pmb{\gamma_{ji}}=1$, $i,j=1,2,\dots,n, i\neq j$. 
+
+This is more general a condition than \eqref{nsp} because \eqref{nsp} is just a special case of \eqref{scaled-nsp} with fixed $\gamma_{ji}=1,\forall i\neq j$, so this offers potentially a larger solution set. The proof for the sufficiency of this ``scaled'' version \eqref{scaled-nsp} is also very similar to that of \eqref{nsp} in Section \ref{proof}. The only downside of this setup is that all the quadratic inequalities are co-dependent and the codependency comes as $\pmb{\gamma_{ij}}\pmb{\gamma_{ji}}=1$ that is non-convex. \\
+  \item We conjecture that \eqref{scaled-nsp} is also a necessary condition. 
+\end{itemize}
+
+
+% section computational_consideration (end)
+
+% section{2-by-2 proof}
+% First, take $i=1$ in \eqref{nsp}, and rearrange terms to get:
+% \begin{equation}\label{ricatti-expanded}
+%  (A_{11}P_1+P_1A_{11}'+\sum_{j\neq1,2}\gamma_{1j}A_{1j}A_{1j}'+(n-2)P_1P_1)
+% \prec -
+% \begin{bmatrix}P_1, A_{12}\end{bmatrix}
+% \begin{bmatrix}
+%     I_{1} & 0 \\
+%     0& \gamma_{12}I_{2}  \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%   &  P_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix}
+% \end{equation}
+% where $I_i$ are identity matrices of appropriate size. 
+
+% Next, for $i=2$ in \eqref{nsp}, by taking Schur complement, the constraint is equivalent to:
+% \begin{equation}\label{schur1st}
+% \begin{bmatrix}
+%    A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2 & \begin{bmatrix}A_{21}, P_2\end{bmatrix}\\
+%    \\
+%    \begin{bmatrix}A_{21}'\\ P_2'\end{bmatrix}&\begin{bmatrix}-I_{1}/\gamma_{21} & 0 \\0& -I_{2}  \\\end{bmatrix}
+% \end{bmatrix}
+% \prec 0
+% \end{equation}
+
+% Use Schur complement from the opposite direction, \eqref{schur1st} is also equivalent to:
+% \begin{equation}\label{schur2nd}
+% \begin{bmatrix}-I_{1}/\gamma_{21} & 0 \\0&-I_{2}  \\\end{bmatrix} \prec 
+% \begin{bmatrix}&A_{21}'\\&P_2'\end{bmatrix}\begin{bmatrix}
+% A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2
+% \end{bmatrix}^{-1}\begin{bmatrix}A_{21}, P_2\end{bmatrix}
+% \end{equation}
+% Scaling \eqref{schur2nd} up by $\gamma_{12}\gamma_{21}$ preserves the order:
+% \begin{equation}\label{schur3rd}
+% \begin{bmatrix}-I_{1}/\gamma_{21} & 0 \\0&-I_{2}  \\\end{bmatrix} \prec 
+% \begin{bmatrix}&A_{21}'\\&P_2'\end{bmatrix}\begin{bmatrix}
+% A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2
+% \end{bmatrix}^{-1}\begin{bmatrix}A_{21}, P_2\end{bmatrix}
+% \end{equation}
+
+% Because $P_1\succ 0$, $(P_1, A_{12} )$ has full row-rank. So pre- and post- multiplying \eqref{schur2nd} with $(P_1, A_{12})$ and $(P_1, A_{12})'$ preserves the positive definite order, i.e.:
+% \begin{equation}\label{leftrightpreserve}
+% \begin{aligned}
+% &
+% \begin{bmatrix}
+% P_1, A_{12}
+% \end{bmatrix}
+% \begin{bmatrix}
+%     I_{1}/\gamma_{21} & 0 \\
+%     0& I_{2}  \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%   &P_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix}\\
+% &\succ-\begin{bmatrix}
+% P_1, A_{12}
+% \end{bmatrix}
+% \begin{bmatrix}
+%   &A_{21}'\\&P_2'\end{bmatrix}\begin{bmatrix} {A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2}\end{bmatrix}^{-1}\begin{bmatrix}A_{21}, P_2\end{bmatrix}
+% \begin{bmatrix}
+%   &  P_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix}  \\
+% &= -(P_1A_{21}'+A_{12}P_2)
+% ({A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2})^{-1}(A_{21}P_1+P_2A_{12}')
+% \end{aligned}
+% \end{equation}
+
+% Combining \eqref{ricatti-expanded} and \eqref{leftrightpreserve}, we get:
+% \begin{equation}\label{finalexpanded}
+% \begin{aligned}
+% &-(A_{11}P_1+P_1A_{11}'+\sum_{j\neq1,2}\gamma_{1j}A_{1j}A_{1j}'+(n-2)P_1P_1)\\
+% \succ &-(P_1A_{21}'+A_{12}P_2)({A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2})^{-1}(A_{21}P_1+P_2A_{12}')  
+% \end{aligned}
+% \end{equation}
+
+% By again taking Schur complement this is equivalent to the negative definiteness of
+% \begin{equation}\label{final}
+% \begin{bmatrix}
+%   &  A_{11}P_1+P_1A_{11}'+\sum_{j\neq1,2}\gamma_{1j}A_{1j}A_{1j}'+(n-2)P_1P_1 &  P_1A_{21}'+A_{12}P_2 \\
+%     & A_{21}P_1+P_2A_{12}' &A_{22}P_2+P_2A_{22}'+\sum_{j\neq1,2}\gamma_{2j}A_{2j}A_{2j}'+(n-2)P_2P_2\\
+% \end{bmatrix} \end{equation}
+% which again trivially guarantees $M_2\prec 0$.
+
+
+
+
+
+% \section{3-by-3} % (fold)
+% \label{sub:3_by_3}
+
+% % subsection 3_by_3 (end)
+% For example, for 3-by-3 partition, the requirement is:
+% \begin{equation}\label{nbyn}
+% \begin{bmatrix}
+%   &  A_{11}Q_1+Q_1A_{11}'  &A_{12}Q_2+ Q_1A_{21}'& A_{13}Q_3+Q_1A_{31}' \\
+%     & A_{21}Q_1+Q_2A_{12}' &A_{22}Q_2+Q_2A_{22}'&  A_{23}Q_3+Q_2A_{32}' \\
+%     & A_{31}Q_1+Q_3A_{13}' &A_{32}Q_2+Q_3A_{23}'&  A_{33}Q_3+Q_3A_{33}' \\
+
+% \end{bmatrix} \prec 0\end{equation}
+
+% section generalization (end)
+
+
+
+
+
+% \section{A sufficient condition} % (fold)
+% \label{sec:preliminary_and_problem_formulation}
+% Consider a passive LTI system $\dot x =Ax$ where A is partitioned to 2-by-2 blocks as follows:
+
+% \[
+% A=
+% \begin{bmatrix}
+%     A_{11} & A_{12} \\
+%     A_{21} & A_{22} \\
+% \end{bmatrix}
+% \]
+% If there exists $\pmb{P_1}$ and $\pmb{P_2}$ such that
+% \begin{subequations}\label{condition}
+% \begin{align}
+% & &\pmb{P_1} \succ 0, \pmb{P_2} \succ 0 \label{P_pd}\\
+% % & & 1>\pmb{\gamma_1} >0,1>\pmb{\gamma_2} >0  \label{Hinf}\\
+% &&(\pmb{P_1}A_{11}+A_{11}'\pmb{P_1}+\pmb{P_1}A_{12}A_{12}'\pmb{P_1}+I_{1})\prec 0 \label{1strow}\\
+% &&(\pmb{P_2}A_{22}+A_{22}'\pmb{P_2}+\pmb{P_2}A_{21}A_{21}'\pmb{P_2}+I_{2})\prec 0\label{2ndrow}\end{align}
+% \end{subequations}
+% Then $P$ that's constructed as follows:
+% \[
+% P=
+% \begin{bmatrix}
+%     P_{1} & 0 \\
+%     0& P_{2}  \\
+% \end{bmatrix}
+% \]
+% satisfies the Lyapunov inequality for the big A matrix, i.e. $PA+A'P\prec 0$. 
+
+
+
+% \section{Proof for two by two}
+% By bounded-real lemma,\eqref{P_pd} and \eqref{1strow} imply that ${P_1}$ is the unique positive definite solution to the Ricatti equation:
+% \begin{equation}
+% ({P_1}A_{11}+A_{11}'{P_1}+{P_1}A_{12}A_{12}'{P_1}+I_{1})= 0\\ \label{ricatti}
+%  \end{equation}
+
+% Pre- and Post-multiply \eqref{ricatti} by ${Q_1}={P_1}^{-1}$, and rearrange the terms to get:
+% \begin{equation}\label{ricatti-expanded}
+% \begin{bmatrix}
+%    A_{11}Q_1+Q_1A11'
+% \end{bmatrix}
+% +
+% \begin{bmatrix}
+% Q_1, A_{12}
+% \end{bmatrix}
+% \begin{bmatrix}
+%     I_{1} & 0 \\
+%     0& I_{2}  \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%   &  Q_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix}
+% = 0
+% \end{equation}
+
+% Similarly, we pre- and post-multiply \eqref{2ndrow} by ${Q_2}={P_2}^{-1}$. Since ${Q_2}\succ 0$, the negative definiteness preserves. Then by taking Schur complement:
+% \begin{equation}\label{schur1st}
+% \begin{bmatrix}
+%    A_{22}Q_2+Q_2A_{22}' & \begin{bmatrix}A_{21}, Q2\end{bmatrix}\\
+%    \begin{bmatrix}A_{21}'\\ Q2'\end{bmatrix}&\begin{bmatrix}-I_{1} & 0 \\0& -I_{2}  \\\end{bmatrix}
+% \end{bmatrix}
+% \prec 0
+% \end{equation}
+
+% Using Schur complement again from the opposite direction, \eqref{schur1st} is also equivalent to:
+% \begin{equation}\label{schur2nd}
+% \begin{bmatrix}I_{1} & 0 \\0& I_{2}  \\\end{bmatrix} \succ - \begin{bmatrix}
+% \begin{bmatrix}&A_{21}'\\&Q_2'\end{bmatrix}*{(A_{22}Q_2+Q_2A_{22}')}^{-1}*\begin{bmatrix}A_{21}, Q_2\end{bmatrix}
+% \end{bmatrix}
+% \end{equation}
+
+% Because $Q_1\succ 0$, $(Q_1, A_{12} )$ has full row-rank. So pre- and post- multiplying \eqref{schur2nd} with $(Q_1, A_{12})$ and $(Q_1, A_{12})'$ preserves the positive definite order:
+% \begin{equation}\label{leftrightpreserve}
+% \begin{aligned}
+% \begin{bmatrix}
+% Q_1, A_{12}
+% \end{bmatrix}
+% \begin{bmatrix}
+%     I_{1} & 0 \\
+%     0& I_{2}  \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%   &  Q_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix} &\succ - \begin{bmatrix}
+% Q_1, A_{12}
+% \end{bmatrix}
+% \begin{bmatrix}\begin{bmatrix}
+% 	&A_{21}'\\&Q_2'\end{bmatrix}*\begin{bmatrix} {(A_{22}Q_2+Q_2A_{22}')}^{-1}\end{bmatrix}*\begin{bmatrix}A_{21}, Q_2\end{bmatrix}\end{bmatrix}
+% \begin{bmatrix}
+%   &  Q_{1}   \\
+%     &A_{12}' \\
+% \end{bmatrix}  \\
+% &= \begin{bmatrix}
+% Q_1A_{21}'+A_{12}Q_2
+% \end{bmatrix}
+% \begin{bmatrix} {(A_{22}Q_2+Q_2A_{22}')}^{-1}\end{bmatrix}*\begin{bmatrix}A_{21}Q_1+Q_2A_{12}'\end{bmatrix}
+% \end{aligned}
+% \end{equation}
+
+% Then by plugging \eqref{ricatti-expanded} into \eqref{leftrightpreserve}, we get:
+% \begin{equation}\label{finalexpanded}
+% (A_{11}Q_1+Q_1A_{11}')+(Q_1A_{21}'+A_{12}Q_2)*{(A_{22}Q_2+Q_2A_{22}')}^{-1}*(A_{21}Q_1+Q_2A_{12}') \prec 0\end{equation}
+% which by again taking Schur complement is equvalent to:
+% \begin{equation}\label{final}
+% \begin{bmatrix}
+%   &  A_{11}Q_1+Q_1A_{11}' &  Q_1A_{21}'+A_{12}Q_2 \\
+%     & A_{21}Q_1+Q_2A_{12}' &A_{22}Q_2+Q_2A_{22}'\\
+% \end{bmatrix} \prec 0\end{equation}
+% and we arrive at the desired Lyapunov inequality.
+
+
+\end{document}
+
+
