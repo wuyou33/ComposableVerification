@@ -1,7 +1,6 @@
 not_stable = true;
 
 while not_stable
-
 A11=randn(3);
 A22=randn(1);
 if real(eig(A11))<0

@@ -10,5 +10,5 @@ cvx_begin sdp
     subject to
         P>=0;
         [A'*P+P*A+C'*C  , P*B+C'*D;
-          (P*B+C'*D)'    D'*D-g*eye(m)]<=0;
+        (P*B+C'*D)'    D'*D-g*eye(m)]<=0;
 Ginf=sqrt(g);
