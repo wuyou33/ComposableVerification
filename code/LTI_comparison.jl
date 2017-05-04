@@ -1,4 +1,13 @@
 using JuMP
+using Mosek
+
+function generate_candidate_A(n,num_of_instances)
+    Q=eye(n)
+    A=randn(n,n)
+
+end
+
+
 
 function LTI_test(partitions=4)
     A = randn(60,60)
