@@ -1,31 +1,16 @@
 import numpy as np
 import scipy.linalg as linalg
-# import timeit
 from timeit import Timer
-# preprosseseing to generate candidate A's
-# t = timeit.Timer("print 'main statement'", "print 'setup'")
-def generate_A(n, number_of_instance):
-    Q = np.eye(n)
-    not_stable = True
-    num_A=0
-    brutal_time=0
-    partitioned_time=0
-    while (not_stable or num_A<=number_of_instance-1):
-        not_stable = True
-        A=np.random.randn(n,n)
-        # only interested in the eigenvalues but not the eigenvector
-        eig_A = np.linalg.eig(A)[0]
-        eig_A.reshape(n,1)
-        # print np.real(eig_A)
-        # print np.all(np.real(eig_A)<0)
-        if np.all(np.real(eig_A)<0):
-            not_stable = False
-            num_A+=1
-            brutal_time+=brutal(A,Q)
-            # partitioned_time+=partitioned(A,num_parts)
-    print num_A
-    print brutal_time
-    return brutal_time, partitioned_time
+from cvxpy improt *
+
+def lumped(n,blk_size)
+    Q=np.eye(n)
+    A=np.randn(n,n)
+    blks=n/blk_size
+    m = Model(solver=MosekSolver(MSK_IPAR_LOG=0))
+    @variable(m,P[1:blk_size,1:n])
+        # addinfocallback(m, infocallback, when = :Intermediate)
+    solve_status=solve(m)
 
 
 def brutal(A,Q):
