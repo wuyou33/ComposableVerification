@@ -1,17 +1,18 @@
 import numpy as np
 import scipy.linalg as linalg
 from timeit import Timer
-from cvxpy improt *
+from cvxpy import *
 
-def lumped(n,blk_size)
+def lumped(n,blk_size):
+    P=Semidef(n,name='lumped_P')
     Q=np.eye(n)
-    A=np.randn(n,n)
+    A=np.random.randn(n,n)
     blks=n/blk_size
-    m = Model(solver=MosekSolver(MSK_IPAR_LOG=0))
-    @variable(m,P[1:blk_size,1:n])
-        # addinfocallback(m, infocallback, when = :Intermediate)
-    solve_status=solve(m)
-
+    obj = 0 
+    final_exp = P*A+A.transpose()*P
+    constraints =[
+    ]
+    prob = cvx.Problem(obj,constraints)
 
 def brutal(A,Q):
     # for a particular A, directly solve 
@@ -35,5 +36,5 @@ def partitioned(A, n, num_parts):
     return A_horizontal, A_vertical
     # X = np.matrix(scipy.linalg.solve_continuous_are(A, B, Q, R))
 
-partitioned(np.eye(60),60,30)
+lumped(6,3)
 # generate_A(10, 10)
