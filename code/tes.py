@@ -6,18 +6,26 @@ import numpy as np
 A=np.eye(10)
 blk_size=5
 i=2
-
+P=[]
 with Model("direct_scaling") as M: 
 	# A=Matrix.sparse(10,10,) 
-	P1=M.variable(Domain.inPSDCone(6))
-
+	for i in range(3):
+		P.append(M.variable(Domain.inPSDCone(6)))
+	E1=P[1].asExpr()
+	# print()
+	# print(Expr.neg(P1))
 
 	# zero_block=Expr.reshape(Expr.zeros(36))
-	zero_block=Expr.zeros(1)
-	slices=Expr.ones(1)
+	zero_block=Expr.reshape(Expr.ones(36),6,6)
+	# slices=Expr.ones(1)
 
-	print(slices)
-	print(Expr.hstack(zero_block,slices))
+	stacked=Expr.hstack(P[2],zero_block)
+	# print(P[1].slice([0,0],[3,3]))
+	print(stacked)
+	print(stacked.slice([0,0],[3,3]))
+	# # print(stacked.shape())
+	# sliced=stacked.slice([1,1],[3,2])
+	# print(sliced)
 # 
 	# M.constraint(zero_block.slice(4,5),Domain.equalsTo(slices))
 # 
@@ -30,7 +38,6 @@ with Model("direct_scaling") as M:
 	# # A = Matrix.eye(6)
 	# M.constraint(Expr.neg(Expr.add(Expr.mul(P,A),Expr.mul(A.transpose(),P))),Domain.inPSDCone())
 	# M.solve()
-
-print(zero_block)
+# print(zero_block)
 
 # print(A[(i-1)*blk_size:i*blk_size,:])
