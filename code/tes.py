@@ -16,13 +16,14 @@ with Model("direct_scaling") as M:
 	# print(Expr.neg(P1))
 
 	# zero_block=Expr.reshape(Expr.zeros(36))
-	zero_block=Expr.reshape(Expr.ones(36),6,6)
+	zero_block=Expr.reshape(Expr.ones(0),6,0)
 	# slices=Expr.ones(1)
 
 	stacked=Expr.hstack(P[2],zero_block)
-	# print(P[1].slice([0,0],[3,3]))
 	print(stacked)
-	print(stacked.slice([0,0],[3,3]))
+	# print(stacked.slice([0,0],[3,3]))
+	# print(stacked)
+	# print(stacked.slice(p[]))
 	# # print(stacked.shape())
 	# sliced=stacked.slice([1,1],[3,2])
 	# print(sliced)
