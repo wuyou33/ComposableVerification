@@ -9,18 +9,31 @@ i=2
 P=[]
 with Model("direct_scaling") as M: 
 	# A=Matrix.sparse(10,10,) 
-	for i in range(3):
-		P.append(M.variable(Domain.inPSDCone(6)))
-	E1=P[1].asExpr()
+	P=(M.variable(Domain.inPSDCone(3)))
+	# E1=P[1].asExpr()
 	# print()
 	# print(Expr.neg(P1))
+	Q=(M.variable(Domain.inPSDCone(3)))
 
-	# zero_block=Expr.reshape(Expr.zeros(36))
-	zero_block=Expr.reshape(Expr.ones(0),6,0)
+	Q1=(M.variable(Domain.inPSDCone(3)))
+	Q2=(M.variable(Domain.inPSDCone(3)))
+
+	# zero_block=Expr.reshape(Expr.zeros(33))
+	# zero_block=Expr.reshape(Expr.ones(9),3,3)
+	# con = Expr.add(P,Q)
+
+
+	# con = Expr.add(P,con)
+	# con = Expr.add(con,Q)
+	con=Expr.hstack(Expr.vstack(P,Q),Expr.vstack(Q1,Q2))
+
+	print(con)
 	# slices=Expr.ones(1)
-
-	stacked=Expr.hstack(P[2],zero_block)
-	print(stacked)
+	M.constraint(con,Domain.inPSDCone())
+	M.solve()
+	print(P.level())
+	# stacked=Expr.hstack(P[2],zero_block)
+	# print(stacked)
 	# print(stacked.slice([0,0],[3,3]))
 	# print(stacked)
 	# print(stacked.slice(p[]))

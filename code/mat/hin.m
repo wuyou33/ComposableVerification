@@ -19,6 +19,7 @@ disp('the rho part starts')
 
 % new loop
 cvx_begin sdp
+cvx_solver mosek
 variable rho(1);
 
 A12=[0;0;rho];
