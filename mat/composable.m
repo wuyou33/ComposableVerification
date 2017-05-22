@@ -8,6 +8,7 @@ blk_size=40;
 num_samples=1000;
 
 num_blks=n/blk_size;
+
 if strcmp(A_option, 'sparse_A')
     density=.2;
     A=sprand(n,n,density)-10*eye(n);
@@ -25,21 +26,22 @@ sample_counter=0;
 ricatti_count=0;
 
 while (sample_counter<=num_samples)
-%     cvx_begin sdp
-%     cvx_solver Mosek
-%     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
-%     tem_Cell=mat2cell(P_i,[blk_size],[blk_size],ones(1,num_blks));
-%     blkd_P=blkdiag(tem_Cell{:});
-%     subject to
-%     blkd_P >= 1e-7*eye(n)
-%     blkd_P*A+A'*blkd_P<= -1e-9*eye(n)
-%     cvx_end
-%     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
+    cvx_begin sdp
+    cvx_solver Mosek
+    variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
+    tem_Cell=mat2cell(P_i,[blk_size],[blk_size],ones(1,num_blks));
+    blkd_P=blkdiag(tem_Cell{:});
+    subject to
+    blkd_P >= 1e-7*eye(n)
+    blkd_P*A+A'*blkd_P<= -1e-9*eye(n)
+    cvx_end
+    if (strcmp(cvx_status,'Solved'))% the lumped version is successful
         sample_counter=sample_counter+1;
         [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
         ricatti_count=ricatti_count+ricatti_succ_count;
-%     end
+    end
 end
+
 lumped_P=full(blkd_P);
 end
 
@@ -81,7 +83,7 @@ R=num_blks*eye(n);
 % and E=I.
 ricatti_time=0;
 A_total_cell=mat2cell(A,blk_size*ones(1,num_blks),blk_size*ones(1,num_blks));
-copy_total=A_total_cell;
+% copy_total=A_total_cell;
 
 for i=1:num_blks
     A([(i-1)*blk_size+1:(i)*blk_size],[(i-1)*blk_size+1:(i)*blk_size]) =zeros(blk_size,blk_size);
@@ -93,12 +95,12 @@ for i=1:num_blks
     tic
     [X,L,G,ricatti_flag]=care(A_total_cell{i,i},A([(i-1)*blk_size+1:(i)*blk_size],:),Q,-R);
     ricatti_time_incremental=toc
-    ricatti_time+ricatti_time_incremental;
+    ricatti_time=ricatti_time+ricatti_time_incremental;
 end
-if ricatti_flag==-1 || ricatti_flag== -2
-    ricatti_succ_count=0;
+if ricatti_flag == -1 || ricatti_flag == -2
+    ricatti_succ_count = 0;
 else
-    ricatti_succ_count=1;
+    ricatti_succ_count = 1;
 end
 end
 
