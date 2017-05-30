@@ -3,18 +3,28 @@ function [ricatti_count, ricatti_time, lumped_P]=composable()
 direct_eigen_cal_on = false;
 A_option = 'sparse_A';
 % A_option = 'dense_A';
-n=1000;
-blk_size=40;
+
+% the LTI example from James Anderson's paper but seems wrong as 
+% A=[-2 4 0 0;-2 -2 -4 -6;-2 2 -2 0;-2 2 4 -2];
+
+A=[-2 0 4 0;-2 -2 2 0;-2 -4 -2 -6;-2 2 4 -2];
+% james_wrong_flag=find(real(eig(A))>0
+
+
+n=4;
+blk_size=2;
 num_samples=1000;
 
 num_blks=n/blk_size;
-if strcmp(A_option, 'sparse_A')
-    density=.2;
-    A=sprand(n,n,density)-10*eye(n);
-elseif strcmp(A_option, 'dense_A')
-    A=randn(n,n);
-else ;
-end
+% if strcmp(A_option, 'sparse_A')
+%     density=.2;
+%     A=sprand(n,n,density)-10*eye(n);
+% elseif strcmp(A_option, 'dense_A')
+%     A=randn(n,n);
+% else ;
+% end
+
+A=[-2 4 0 0;-2 -2 -4 -6;-2 2 -2 0;-2 2 4 -2];
 
 if direct_eigen_cal_on
     direct_eigen_cal();
@@ -24,7 +34,7 @@ cvx_status='s';
 sample_counter=0;
 ricatti_count=0;
 
-while (sample_counter<=num_samples)
+% while (sample_counter<=num_samples)
     cvx_begin sdp
     cvx_solver Mosek
     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
@@ -36,10 +46,10 @@ while (sample_counter<=num_samples)
     cvx_end
     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
         sample_counter=sample_counter+1;
-        [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
-        ricatti_count=ricatti_count+ricatti_succ_count;
+        [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
+%         ricatti_count=ricatti_count+ricatti_succ_count;
     end
-end
+% end
 lumped_P=full(blkd_P);
 end
 
@@ -63,7 +73,7 @@ cvx_end
 end
 
 
-function [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
+function [ricatti_succ, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
 scaling_choice = 'identity';
 scaling_choice = 'weight';
 
@@ -73,6 +83,8 @@ else
     % use the largest singular value as a huristic guess
     M=svds(A,1);
 end
+
+
 Q=num_blks*eye(blk_size);
 
 R=num_blks*eye(n);
@@ -88,17 +100,24 @@ for i=1:num_blks
     % copy_total=mat2cell(copy_total,blk_size*ones(1,num_blks),blk_size*(num_blks-1))
 end
 
+ricatti_succ_count=0;
 
 for i=1:num_blks
     tic
     [X,L,G,ricatti_flag]=care(A_total_cell{i,i},A([(i-1)*blk_size+1:(i)*blk_size],:),Q,-R);
+    disp(ricatti_flag);
     ricatti_time_incremental=toc
-    ricatti_time+ricatti_time_incremental;
+    ricatti_time=ricatti_time+ricatti_time_incremental;
+    if ricatti_flag~=-1 & ricatti_flag~= -2
+        ricatti_succ_count=ricatti_succ_count+1;
+    end
 end
-if ricatti_flag==-1 || ricatti_flag== -2
-    ricatti_succ_count=0;
+
+if ricatti_succ_count==num_blks
+    disp('true')
+    ricatti_succ=true;
 else
-    ricatti_succ_count=1;
+    ricatti_succ=false;
 end
 end
 
