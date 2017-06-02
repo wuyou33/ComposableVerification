@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[]{amsmath}
+\usepackage{amsthm} 
+\usepackage{amsbsy}
+% \newtheorem*{remark}{Main Result}
+\usepackage{breqn}
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage[margin=1in]{geometry}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newtheorem*{remark}{Remark}
+% \usepackage{todonotes}
+% \usepackage{algorithmic}
+% \usepackage[numbered, framed]{mcode}
+% \newtheorem{remark}{Remark}
+\begin{document}
+
+
+
+
+\section{Composable Verification for Polynomial System} % (fold)
+\label{sec:composable_verification_for_polynomial_system}
+Consider a polynomial system $\dot x=f(x)$ where the state vector $x\in \mathbb{R}^m$. Partition $x$ into $n$ disjoint parts $x=[x_1;x_2;\dots;x_n]$ where $x_i \in \mathbb{R}^{m_i}$ and $\sum\limits_{i}{m_i}=m$, and write the dynamics of the sub-systems as $\dot{x_i}=f_i(x_i)+g_i(x)$, $i=1,2,\dots,n$, that is, $f_i$ is a polynomial function purely of $x_i$, whereas $g_i$ is a function of the original system states $x$. For simplicity, group any constant terms into $f_i$, so then $g_i$ consists of all the cross-product terms.
+
+$\lnot$
+
+
+If 
+then $V=\sum\limits_{i}{V_i}$ is a Lyapunov function for the original system, i.e. $\frac{\partial{V}}{x}<0$
+
+$\frac{\partial{V}}{x}=\sum\limits_{i}{\frac{\partial{V_i}}{x_i}\dot{x_i}}=\sum\limits_{i}{\frac{\partial{V_i}}{x_i}(f_i(x_i)+g_i(x)})$
+
+
+\section{Polynomial extension to Schur complement} % (fold)
+\label{sec:polynomial_extension_to_schur_complement}
+Consider the following problem: Given a polynomial function $p(x)$, which is known to be sum-of-squares, find a polynomial function $f(x)$ of a fixed degree such that $p(x)-f(x)^2$ is SOS. At first glance, due to the quadratic term $f(x)^2$, the constraints involves that is quadratic in the decision variables, illegal in the low-level SDP solvers' problem setup. However, 
+
+
+The interpretation of the result above is immendiate from 
+
+
+
+% section polynomial_extension_to_schur_complement (end)
+
+
+\end{document}
+
+
