@@ -30,12 +30,14 @@ Consider a polynomial system $\dot x=f(x)$ where the state vector $x\in \mathbb{
 $\lnot$
 
 
-If 
-then $V=\sum\limits_{i}{V_i}$ is a Lyapunov function for the original system, i.e. $\frac{\partial{V}}{x}<0$
+If a sequence of polynomial function $V=\sum\limits_{i}{V_i}$ satisfies, then $V=\sum\limits_{i}{V_i}$ is a Lyapunov function for the original system, i.e. $\frac{\partial{V}}{x}<0$
 
 $\frac{\partial{V}}{x}=\sum\limits_{i}{\frac{\partial{V_i}}{x_i}\dot{x_i}}=\sum\limits_{i}{\frac{\partial{V_i}}{x_i}(f_i(x_i)+g_i(x)})$
 
+\section{Proof} % (fold)
+\label{sec:proof}
 
+% section proof (end)
 \section{Polynomial extension of Schur complement} % (fold)
 \label{sec:polynomial_extension_to_schur_complement}
 Consider the following problem: Given a polynomial function $p(x)$, which is known to be sum-of-squares, i.e. $p(x)=m_p'(x)Pm_p(x)$ where $m_p(x)$ is an appropriate monomial basis, and $P\succ 0$, the problem is to find a polynomial function $f(x)=c'*m_f(x)$ of a fixed degree $d$ such that $p(x)-f(x)^2$ is SOS. At first glance, due to the constraint involving terms that is quadratic in the decision variables coming from $f(x)^2$, illegal in the low-level SDP solvers' problem setup. Let us take a closer investigation. Finding an SOS decomposition of $p(x)-f(x)^2$ is equivalent to finding a $Q \succ 0$ such that $p(x)-f(x)^2=m'(x)Qm(x)$ where $m(x)$ is a monomial basis. Since $p(x)$ is known, and $f(x)$ is of a fixed degree, $m(x)$ is known, and it contains at least all the elements in $m_p(x)$ and $m_f(x)$. Hence, $p(x)$ can be re-written as $p(x)=m'(x)\tilde{P}m(x)$, where $\tilde{P}$ is $P$ padded with zeros accounting for the added element in $m(x)$ and is guaranteed to be p.s.d. as well. Similarly, $f(x)=\tilde{c}'*m(x)$ where $\tilde{c}$, the vector of coefficients, is the padded decision variables. Next, since $f(x)$ is a scalar polynomial function, $f(x)^2=f'(x)*f(x)=m'(x)*\tilde{c}*\tilde{c}'*m(x)$. Combining everything together, we have $p(x)-f(x)^2=m'(x)[\tilde{P}-\tilde{c}'*\tilde{c}]m(x)$. In other words, we've transformed the problem of finding $Q$ into finding $\tilde{c}$ such that $(\tilde{P}-\tilde{c}'*\tilde{c})\succ 0$ where $\tilde{P}$ is known and is p.s.d. This can be convexified by the well-known Schur complement trick as:
@@ -46,7 +48,7 @@ Consider the following problem: Given a polynomial function $p(x)$, which is kno
 \end{bmatrix}\succ 0 \], which can be readily handled by any SDP solvers. 
 
 
-As a side note, the result above exploits the inherent equivalence of an SOS decomposition and an SDP. In fact, an SDP constraint is nothing but an SOS decomposition with a monomial basis capped at degree 1. From this point of view, other convexify tricks developed by the LMI community may be straightforwardly generalizable to SOS too. A precise proof is of course still required to make any claim. 
+As a side note, the result above exploits nothing but the inherent equivalence of an SOS decomposition and an SDP. In fact, a matrix p.s.d. constraint is a special case of an SOS decomposition where the monomial basis are element-wise with degree exactly one. From this point of view, other convexify tricks developed by the SDP community may be straightforwardly generalizable to SOS too. Of course a precise proof is still necessary before any claim can be made.  
 % section polynomial_extension_to_schur_complement (end)
 
 
