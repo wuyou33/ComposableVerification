@@ -75,7 +75,8 @@ prog = prog.withIndeterminate([X1;y(1)]);
 prog = prog.withSOS(V1);
 PV1PX1 = diff(V1,X1);
 V1dot = diff(V1,X1)*dX1dt;
-prog = prog.withSOS(-V1dot+2*X1'*PV1PX1'*(0.136e-1*x9)*y(1)+y(1)^2); 
+V1dotcomp=-V1dot+2*X1'*PV1PX1'*(0.136e-1*x9)*y(1)+y(1)^2-(-0.936*x3)^2-(-0.195*x1)^2-(x1)^2-(-0.881*x9)^2-(x9)^2;
+prog = prog.withSOS(-V1dot); 
 
 options = spot_sdp_default_options();
 sol = prog.minimize(0,@spot_mosek,options);
@@ -89,28 +90,30 @@ if ~sol.isDualFeasible
 end
 
 V1 = sol.eval(V1);
-
+partition2=0;
+partition3=0;
 % partition 2
+if (partition2==1)
+	prog = spotsosprog;
+	prog = prog.withIndeterminate([X2;y(2)]);
+	[prog,V2] = prog.newFreePoly(V2Xmonom);
+	prog = prog.withSOS(V2);
+	PV2PX2 = diff(V2,X2);
+	V2dot = diff(V2,X2)*dX2dt;
+	prog = prog.withSOS(-(V2dot+2*X2'*PV2PX2'*y(2)-y(2)'*y(2))); 
+	sol = prog.minimize(0,@spot_mosek,options);
 
-prog = spotsosprog;
-prog = prog.withIndeterminate([X2;y(2)]);
-[prog,V2] = prog.newFreePoly(V2Xmonom);
-prog = prog.withSOS(V2);
-PV2PX2 = diff(V2,X2);
-V2dot = diff(V2,X2)*dX2dt;
-prog = prog.withSOS(-(V2dot+2*X2'*PV2PX2'*y(2)-y(2)'*y(2))); 
-sol = prog.minimize(0,@spot_mosek,options);
+	if ~sol.isPrimalFeasible
+	  error('Problem looks primal infeasible');
+	end
 
-if ~sol.isPrimalFeasible
-  error('Problem looks primal infeasible');
+	if ~sol.isDualFeasible
+	  error('Problem looks dual infeasible. It is probably unbounded. ');
+	end
+	V2= sol.eval(V2);
 end
 
-if ~sol.isDualFeasible
-  error('Problem looks dual infeasible. It is probably unbounded. ');
-end
-V2= sol.eval(V2);
-
-
+if (partition3==1)
 % partition 3
 prog = spotsosprog;
 prog = prog.withIndeterminate([X3;y(3)]);
@@ -129,8 +132,10 @@ if ~sol.isDualFeasible
   error('Problem looks dual infeasible. It is probably unbounded. ');
 end
 V3= sol.eval(V3);
-
+end
 
 disp(V1);
+disp(V2);
+disp(V3)
 
 % rho = double(sol.eval(rho));
