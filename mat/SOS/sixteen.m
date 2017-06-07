@@ -1,4 +1,4 @@
-degV=2;
+degV=4;
 
 x=msspoly('x',16);
 y=msspoly('y',3);
@@ -76,7 +76,8 @@ prog = prog.withSOS(V1);
 PV1PX1 = diff(V1,X1);
 V1dot = diff(V1,X1)*dX1dt;
 V1dotcomp=-V1dot+2*X1'*PV1PX1'*(0.136e-1*x9)*y(1)+y(1)^2-(-0.936*x3)^2-(-0.195*x1)^2-(x1)^2-(-0.881*x9)^2-(x9)^2;
-prog = prog.withSOS(-V1dot); 
+prog = prog.withSOS(-V1dot);
+prog = prog.withSOS(-V1dotcomp);
 
 options = spot_sdp_default_options();
 sol = prog.minimize(0,@spot_mosek,options);

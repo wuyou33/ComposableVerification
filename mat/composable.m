@@ -3,9 +3,9 @@ function [ricatti_count, ricatti_time, lumped_P]=composable()
 direct_eigen_cal_on = false;
 A_option = 'sparse_A';
 % A_option = 'dense_A';
-n=1000;
-blk_size=40;
-num_samples=1000;
+n=2;
+blk_size=1;
+num_samples=1;
 
 num_blks=n/blk_size;
 
@@ -24,6 +24,7 @@ end
 cvx_status='s';
 sample_counter=0;
 ricatti_count=0;
+A=     [ 0    -1;1    -1];
 
 while (sample_counter<=num_samples)
     cvx_begin sdp
