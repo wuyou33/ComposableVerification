@@ -1,0 +1,11 @@
+[x,y] = meshgrid(-.5:.2:3.5,-2.5:.2:3.5);
+[z,w] = meshgrid(-.5:.2:3.5,-2.5:.2:3.5);
+px=y;
+py=-2*x+z+2;
+pz=w;
+pw=-2*z+w+2;
+quiver(y,w,py,pw);
+% axis([-3 3 -3 3 -3 3]);
+xlabel('y');
+ylabel('w');
+% zlabel('z');
