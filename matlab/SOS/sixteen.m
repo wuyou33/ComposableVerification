@@ -1,4 +1,4 @@
-degV=4;
+degV=2;
 
 x=msspoly('x',16);
 y=msspoly('y',3);
