@@ -26,6 +26,9 @@ X2 = [x2,x6,x10,x15,x16]';
 X3 = [x4,x5,x11,x12,x13,x14]';
 
 
+% the actual dynamics 
+
+% re-writeen the dynamics in the 'coupled' fashion using the notation there
 dx1dt = -1.0*x1^2-0.167*x1*x3-1.16*x1-0.193*x3;
 dx3dt = -1.0*x3^2-0.397e-1*x3;
 dx7dt = -0.143*x1*x7-1.0*x7^2-0.388*x8*x7-0.163*x1-1.14*x7-0.443*x8;
@@ -64,9 +67,7 @@ V1Xmonom = monomials(X1,0:degV);
 V2Xmonom = monomials(X2,0:degV);
 V3Xmonom = monomials(X3,0:degV);
 
-
-% partition 1
-
+% partiotn 1
 prog = spotsosprog;
 prog = prog.withIndeterminate([X1;y(1)]);
 
