@@ -69,7 +69,6 @@ end
 function [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
 scaling_choice = 'identity';
 scaling_choice = 'weight';
-
 if (strcmp(scaling_choice,'identity'))
     M=cell{ones};
 else
