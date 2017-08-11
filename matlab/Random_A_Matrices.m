@@ -1,11 +1,11 @@
-function [ricatti_count, ricatti_time, lumped_P]=composable()
+function [ricatti_count, ricatti_time, lumped_P]=Random_A_Matrices()
 % parameters
 direct_eigen_cal_on = false;
 A_option = 'sparse_A';
 % A_option = 'dense_A';
 n=2;
 blk_size=1;
-num_samples=1000;
+num_samples=5;
 
 num_blks=n/blk_size;
 
@@ -25,8 +25,10 @@ cvx_status='s';
 sample_counter=0;
 ricatti_count=0;
 
+lumped_total=0;
 while (sample_counter<=num_samples)
-    cvx_begin sdp
+    tic
+    cvx_begin sdp 
     cvx_solver Mosek
     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
     tem_Cell=mat2cell(P_i,[blk_size],[blk_size],ones(1,num_blks));
@@ -35,13 +37,17 @@ while (sample_counter<=num_samples)
     blkd_P >= 1e-7*eye(n)
     blkd_P*A+A'*blkd_P<= -1e-9*eye(n)
     cvx_end
+    lump=toc;
     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
         sample_counter=sample_counter+1;
-        [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
-        ricatti_count=ricatti_count+ricatti_succ_count;
+        % [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
+        % ricatti_count=ricatti_count+ricatti_succ_count;
     end
+    lumped_total=lumped_total+lump;
 end
+
 lumped_P=full(blkd_P);
+lumped_total
 end
 
 function sparse_LMIs(A,n,blk_size)

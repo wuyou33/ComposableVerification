@@ -65,7 +65,7 @@ x16=x(16);
 X1 = [x1,x3,x7,x8,x9]';
 X2 = [x2,x6,x10,x15,x16]';
 X3 = [x4,x5,x11,x12,x13,x14]';
-
+epsi=1e-4;
 f1=[-1.0*x1^2-0.167*x1*x3-1.16*x1-0.193*x3;
 -1.0*x3^2-0.397e-1*x3;
 -0.143*x1*x7-1.0*x7^2-0.388*x8*x7-0.163*x1-1.14*x7-0.443*x8;
@@ -83,15 +83,18 @@ f2=[-1.0*x2^2-0.113*x10*x2-1.26*x2-0.142*x10;
 
 
 g21=[0;0;0;-0.548*x15-0.936;0];
+% (5,1_)
 h21=[x3];
+% (1,1)
 
 g23=[x2,1,0,0,0,0;
 	0,0,-.271,0,0,-0.866*x6;
 	0,0,0,0,0,0
 	0,0,0,0,0,0;
 	0,0,0,0,-0.407*x16-0.275,0];
+	% 5,5
 h23=[-0.969*x4-0.264*x5;-1.22*x4-0.333*x5;x4;0;x5;x4];
-
+% 5,1
 
 f3=[ -1.0*x4^2-0.926e-1*x4;
 -0.847*x4*x5-1.0*x5^2-1.77*x4-2.09*x5;
@@ -110,10 +113,10 @@ prog = spotsosprog;
 prog = prog.withIndeterminate(X3);
 Bmonom = monomials(X3,0:2);
 [prog,B] = prog.newFreePoly(Bmonom);
-prog.withSOS(-(clean(diff(B,X3)*f3))+h23'*h23);
-prog.withSOS(B-1);
+prog=prog.withSOS(-(clean(diff(B,X3)*f3))+epsi);
+prog=prog.withSOS(B-epsi);
 options = spot_sdp_default_options();
+options.verbose=0;
 sol=prog.minimize(-0,@spot_mosek,options);
-solB=sol.eval(B);
-
+solB=sol.eval(B)
 
