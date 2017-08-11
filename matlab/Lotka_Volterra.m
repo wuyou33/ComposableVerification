@@ -110,7 +110,7 @@ prog = spotsosprog;
 prog = prog.withIndeterminate(X3);
 Bmonom = monomials(X3,0:2);
 [prog,B] = prog.newFreePoly(Bmonom);
-prog.withSOS(-(clean(diff(B,X3)*f3))+1);
+prog.withSOS(-(clean(diff(B,X3)*f3))+h23'*h23);
 prog.withSOS(B-1);
 options = spot_sdp_default_options();
 sol=prog.minimize(-0,@spot_mosek,options);
