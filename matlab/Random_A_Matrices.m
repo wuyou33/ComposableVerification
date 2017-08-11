@@ -1,11 +1,8 @@
-function [ricatti_count, ricatti_time, lumped_P]=Random_A_Matrices()
+function [ricatti_count, ricatti_time, lumped_P]=Random_A_Matrices(n,blk_size,num_samples)
 % parameters
 direct_eigen_cal_on = false;
 A_option = 'sparse_A';
 % A_option = 'dense_A';
-n=2;
-blk_size=1;
-num_samples=5;
 
 num_blks=n/blk_size;
 
@@ -24,7 +21,7 @@ end
 cvx_status='s';
 sample_counter=0;
 ricatti_count=0;
-
+A_cell=cell(num_samples,1);
 lumped_total=0;
 while (sample_counter<=num_samples)
     tic
@@ -40,12 +37,12 @@ while (sample_counter<=num_samples)
     lump=toc;
     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
         sample_counter=sample_counter+1;
-        % [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
-        % ricatti_count=ricatti_count+ricatti_succ_count;
+        % A_cellsample_counter
+        [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks);
+        ricatti_count=ricatti_count+ricatti_succ_count;
     end
     lumped_total=lumped_total+lump;
 end
-
 lumped_P=full(blkd_P);
 lumped_total
 end
