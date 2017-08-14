@@ -75,23 +75,23 @@ f1=[-1.0*x1^2-0.167*x1*x3-1.16*x1-0.193*x3;
 -0.143*x1*x7-1.0*x7^2-0.388*x8*x7-0.163*x1-1.14*x7-0.443*x8;
 -1.0*x8^2-0.198*x8;
 -0.146*x9*x3-0.107*x3-0.730*x9-1.0*x9^2;];
-g12=[zeros(4,1);-0.994e-2-0.136e-1*x9];
-h12=[x12];
+g12=[zeros(4,1);-0.994e-2-0.136e-1*x9]; %5,1
+h12=[x12];%1,1
 
 f2=[-1.0*x2^2-0.113*x10*x2-1.26*x2-0.142*x10;
 -1.0*x6^2-0.313*x6;
  -0.419*x6*x10-1.0*x10^2-0.822*x6-1.96*x10;
 -0.796*x15*x6-0.230*x15*x10-1.0*x15^2-1.36*x6-0.394*x10-1.71*x15;
 -0.527*x15*x16-1.0*x16^2-0.356*x15-0.676*x16];
-g21=[0;0;0;-0.548*x15-0.936;0];
-h21=[x3];
+g21=[0;0;0;-0.548*x15-0.936;0];%5,1
+h21=[x3];%1,1
 g23=[x2,1,0,0,0,0;
 	0,0,-.271,0,0,-0.866*x6;
 	0,0,0,0,0,0
 	0,0,0,0,0,0;
-	0,0,0,0,-0.407*x16-0.275,0];
+	0,0,0,0,-0.407*x16-0.275,0];%5,6
 
-h23=[-0.969*x4-0.264*x5;-1.22*x4-0.333*x5;x4;0;x5;x4];
+h23=[-0.969*x4-0.264*x5;-1.22*x4-0.333*x5;x4;0;x5;x4];%6,1
 
 
 f3=[ -1.0*x4^2-0.926e-1*x4;
@@ -106,31 +106,39 @@ g32=[0;0;-0.947e-1*x11-0.370e-2;0;0;0];
 h32=[x10];
 
 time=0;
-% % finding V1
+
+
+% finding V1
 tic
 prog = spotsosprog;
 prog = prog.withIndeterminate([X1;y]);
 Vmonom = monomials(X1,0:2);
 [prog,V] = prog.newFreePoly(Vmonom);
-partialV1=clean(diff(V,X1)*f1);
-prog=prog.withSOS(-partialV1+epsi);
-Vdot=partialV1+2*clean(diff(V,X1)*g12*y)-(x1^2+x3^2+x9^2+y^2);
-prog=prog.withSOS(-Vdot+epsi);
 prog=prog.withSOS(V-epsi);
+
+% partialV1=-clean(diff(V,X1)*f1)-(h21^2+h31'*h31);
+% prog=prog.withSOS(partialV1-epsi);
+
+% Vdot=partialV1-2*((diff(V,X1)*f1)*g12*y)+y^2;
+% prog=prog.withSOS(-Vdot+epsi);
+
 options = spot_sdp_default_options();
 options.verbose=0;
 sol=prog.minimize(-0,@spot_mosek,options);
 V1=sol.eval(V);
 time1=toc;
+
 % finding V2
 tic
 prog = spotsosprog;
 prog = prog.withIndeterminate([X2;y]);
 Vmonom = monomials(X2,0:2);
 [prog,V] = prog.newFreePoly(Vmonom);
-Vdot=clean(diff(V,X2)*f2-(x2^2+x10^2));
-prog=prog.withSOS(-Vdot+epsi);
 prog=prog.withSOS(V-epsi);
+
+Vdot=clean(diff(V,X2)*f2+(x2^2+x10^2));
+prog=prog.withSOS(-Vdot+epsi);
+
 options = spot_sdp_default_options();
 options.verbose=0;
 sol=prog.minimize(-0,@spot_mosek,options);
@@ -142,9 +150,11 @@ prog = spotsosprog;
 prog = prog.withIndeterminate([X3;y]);
 Vmonom = monomials(X3,0:2);
 [prog,V] = prog.newFreePoly(Vmonom);
+prog=prog.withSOS(V-epsi);
+
 Vdot=clean(diff(V,X3)*f3);
 prog=prog.withSOS(-Vdot+epsi);
-prog=prog.withSOS(V-epsi);
+
 options = spot_sdp_default_options();
 options.verbose=0;
 sol=prog.minimize(-0,@spot_mosek,options);
