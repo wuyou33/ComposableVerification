@@ -8,8 +8,6 @@ A_option = 'sparse_A';
 % A=[-2 4 0 0;-2 -2 -4 -6;-2 2 -2 0;-2 2 4 -2];
 
 A=[-2 0 4 0;-2 -2 2 0;-2 -4 -2 -6;-2 2 4 -2];
-% james_wrong_flag=find(real(eig(A))>0
-
 
 n=4;
 blk_size=2;
