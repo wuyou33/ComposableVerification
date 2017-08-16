@@ -138,7 +138,7 @@ prog=prog.withSOS(V-epsi);
 q2=clean(diff(V,X2)*f2)-h12'*h12-h32'*h32;
 prog=prog.withSOS(-q2+epsi);
 
-s2=diff(V,X2)*f2*g21+
+s2=diff(V,X2)*f2*g21;
 prog=prog.withSOS(-q2+2*y*s2+y^2);
 
 options = spot_sdp_default_options();
