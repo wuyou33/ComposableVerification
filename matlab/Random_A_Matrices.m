@@ -66,10 +66,9 @@ blkd_P*A+A'*blkd_P<= -1e-9*eye(n)
 cvx_end
 end
 
-
 function [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
 scaling_choice = 'identity';
-scaling_choice = 'weight';
+scaling_choice = 'sigma';
 if (strcmp(scaling_choice,'identity'))
     M=cell{ones};
 else
@@ -90,7 +89,6 @@ for i=1:num_blks
     A([(i-1)*blk_size+1:(i)*blk_size],[(i-1)*blk_size+1:(i)*blk_size]) =zeros(blk_size,blk_size);
     % copy_total=mat2cell(copy_total,blk_size*ones(1,num_blks),blk_size*(num_blks-1))
 end
-
 
 for i=1:num_blks
     tic
