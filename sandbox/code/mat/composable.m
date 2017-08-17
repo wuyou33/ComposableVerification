@@ -32,7 +32,7 @@ cvx_status='s';
 sample_counter=0;
 ricatti_count=0;
 
-% while (sample_counter<=num_samples)
+while (sample_counter<=num_samples)
     cvx_begin sdp
     cvx_solver Mosek
     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
@@ -47,7 +47,7 @@ ricatti_count=0;
         [ricatti_succ_count, ricatti_time] = Ricaati(A,n,blk_size,num_blks)
 %         ricatti_count=ricatti_count+ricatti_succ_count;
     end
-% end
+end
 lumped_P=full(blkd_P);
 end
 

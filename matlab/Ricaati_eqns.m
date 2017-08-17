@@ -1,4 +1,9 @@
-function [ricatti_succ_count, ricatti_time] = Ricaati_eqns(A,n,blk_size,scaling_choice)
+function [ricatti_succ_count, ricatti_time] = Ricaati_eqns(scaling_choice)
+load('all_A.mat');
+n=size(all_A,1);
+blk_size=size(all_A,2);
+num_samples=size(all_A,3);
+
 scaling_choice = 'identity';
 scaling_choice = 'sigma';
 if (strcmp(scaling_choice,'identity'))
@@ -7,6 +12,7 @@ else
     % use the largest singular value as a huristic guess
     M=svds(A,1);
 end
+
 Q=num_blks*eye(blk_size);
 
 R=num_blks*eye(n);

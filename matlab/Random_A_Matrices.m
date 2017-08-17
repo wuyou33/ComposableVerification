@@ -46,6 +46,7 @@ while (sample_counter<num_samples)
 end
 lumped_P=full(blkd_P);
 avg_lumped_time=lumped_total_time/num_samples;
+
 save('all_A.mat','all_A');
 end
 
