@@ -32,7 +32,7 @@ while (sample_counter<num_samples)
     blkd_P=blkdiag(tem_Cell{:});
     subject to
     blkd_P >= 1e-7*eye(n)
-    blkd_P*A+A'*blkd_P<= -1e-9*eye(n)
+    blkd_P*A+A'*blkd_P <= -1e-9*eye(n)
     cvx_end
     lump=toc;
     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
