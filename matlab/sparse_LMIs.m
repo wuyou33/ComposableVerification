@@ -13,11 +13,13 @@ cvx_solver Mosek
 while (sample_counter<=num_samples)
     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite;
     tem_Cell=mat2cell(P_i,[blk_size],[blk_size],ones(1,num_blks));
+    blkd_P=blkdiag(tem_Cell{:});
 
     for i = 1:num_blks
-
+        wew = zeros(n,n);
+        wew(i*blk_size:(i+1)*blk_size,i*blk_size:
+                    (i+1)*blk_size)=tem_Cell{:,:,i}
     end
-    blkd_P=blkdiag(tem_Cell{:});
 
     variable M_ij(blk_size,blk_size,num_blks*(num_blks-1)) hermitian semidefinite;
     
@@ -54,8 +56,6 @@ while (sample_counter<=num_samples)
             end            
         end
     end
-
-
 end
 
 tem_Cell_D=mat2cell(D,[n],[n],ones(1,num_blks));
