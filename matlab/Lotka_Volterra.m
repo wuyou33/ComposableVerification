@@ -16,12 +16,14 @@
 % dx15/dt = -0.548*x15*x3-0.796*x15*x6-0.230*x15*x10-1.0*x15^2-0.936*x3-1.36*x6-0.394*x10-1.71*x15;
 % dx16/dt = -0.407*x16*x5-0.527*x15*x16-1.0*x16^2-0.275*x5-0.356*x15-0.676*x16
 
+
 function [time1,time2,time3,time] = Lotka_Volterra()
 checkDependency('spotless');
 checkDependency('mosek');
 
 x=msspoly('x',16);
-y=msspoly('y',1);
+y=msspoly('y',6);
+z=msspoly('z',5);
 
 x1=x(1);
 x2=x(2);
@@ -40,12 +42,20 @@ x14=x(14);
 x15=x(15);
 x16=x(16);
 
+V1=0.559*x8^2+0.343*x8*x7+0.711*x7^2+0.435e-1*x8*x1+0.619e-2*x1*x7+0.725*x1^2+.222e-1*x8*x3-0.239e-1*x7
+         0.238*x1*x3+.153*x3^2+0.741e-1*x9*x8+0.331e-1*x9*x7+0.774e-1*x9*x1+0.214*x9*x3+0.755*x9^2;
+
+V2=0.546*x15^2+0.114e-1*x15*x16+0.789*x16^2+0.388*x15*x6-0.151e-1*x16*x6+1.00*x6^2-0.101*x15*x10+0.372e
+         0.228*x6*x10+0.611*x10^2+0.175e-1*x15*x2+0.215e-1*x16*x2+0.138e-1*x6*x2-0.344e-2*x10*x2+0.795*x2^2;
+
+V3=0.719*x4^2+0.500*x4*x5+0.338*x5^2+0.238e-2*x14*x4-0.443e-2*x14*x5+0.533*x14^2+0.653e-1*x12*x4+
+                  0.126e-1*x12*x5+0.438*x14*x12+0.755*x12^2-0.139*x13*x4+0.163e-1*x5*x13+0.255e-1*x14*x13+0.305e-1*x13
+                  0.784*x13^2+0.220e-1*x11*x4+0.297e-3*x11*x5-0.639e-3*x14*x11+0.761e-2*x12*x11-0.114e-3*x13*x11+0.806e-1*x11^2
 % the partition
 X1 = [x1,x3,x7,x8,x9]';
 X2 = [x2,x6,x10,x15,x16]';
 X3 = [x4,x5,x11,x12,x13,x14]';
 epsi=1e-7;
-
 
 f1=[-1.0*x1^2-0.167*x1*x3-1.16*x1-0.193*x3;
 -1.0*x3^2-0.397e-1*x3;
@@ -88,18 +98,19 @@ time=0;
 % finding V1
 tic
 prog = spotsosprog;
-prog = prog.withIndeterminate([X1;y]);
+prog = prog.withIndeterminate([X1;z]);
 Vmonom = monomials(X1,0:2);
-[prog,V] = prog.newFreePoly(Vmonom);
-prog=prog.withSOS(V-epsi);
-q1=(diff(V,X1)*f1)-(h21'*h21+h31'*h31);
-% prog=prog.withSOS(-q1+epsi);
+[prog,V] = prog.newSOSPoly(Vmonom);
+[prog,slacks] = prog.newPos(2);
+q1=(diff(V,X1)*f1)-.5*(h21'*h21+h31'*h31);
+prog=prog.withSOS(-q1-slacks(1));
 s1=diff(V,X1)*f1*g13;
-prog=prog.withSOS(-q1+2*y*s1+y^2);
+prog=prog.withSOS(-q1+2*z'*s1+z'*z-slacks(2));
 options = spot_sdp_default_options();
 options.verbose=0;
-sol=prog.minimize(-0,@spot_mosek,options);
-V1=sol.eval(V);
+sol=prog.minimize(-sum(slacks),@spot_mosek,options);
+V1=sol.eval(V)
+slacks=sol.eval(slacks)
 time1=toc;
 
 % finding V2
@@ -108,41 +119,40 @@ prog = spotsosprog;
 prog = prog.withIndeterminate([X2;y]);
 Vmonom = monomials(X2,0:2);
 [prog,V] = prog.newFreePoly(Vmonom);
-prog=prog.withSOS(V-epsi);
+prog=prog.withSOS(V);
 
 q2=clean(diff(V,X2)*f2)-(h12'*h12+h32'*h32)/2;
-prog=prog.withSOS(-q2+epsi);
+prog=prog.withSOS(-q2);
 
 s2=.5*(diff(V,X2)*f2*g21);
 prog=prog.withSOS(-q2+2*y*s2+y^2);
-
 options = spot_sdp_default_options();
 options.verbose=0;
 sol=prog.minimize(-0,@spot_mosek,options);
 V2=sol.eval(V);
 time2=toc;
 
-% % fidning V3
-tic
-prog = spotsosprog;
-prog = prog.withIndeterminate([X3;y]);
-Vmonom = monomials(X3,0:2);
-[prog,V] = prog.newFreePoly(Vmonom);
-prog=prog.withSOS(V-epsi);
+% % % fidning V3
+% tic
+% prog = spotsosprog;
+% prog = prog.withIndeterminate([X3;y]);
+% Vmonom = monomials(X3,0:2);
+% [prog,V] = prog.newFreePoly(Vmonom);
+% prog=prog.withSOS(V-epsi);
 
-q3=clean(diff(V,X3)*f3)-(h13'*h13+h23'*h23)/2;
-prog=prog.withSOS(-q3+epsi);
+% q3=clean(diff(V,X3)*f3)-(h13'*h13+h23'*h23)/2;
+% prog=prog.withSOS(-q3+epsi);
 
-s3=.5*(diff(V,X3)*f3*g32);
-prog=prog.withSOS(-q3+2*y*s3+y^2);
+% s3=.5*(diff(V,X3)*f3*g32);
+% prog=prog.withSOS(-q3+2*y*s3+y^2);
 
-options = spot_sdp_default_options();
-options.verbose=0;
-sol=prog.minimize(-0,@spot_mosek,options);
-V3=sol.eval(V);
-time3=toc;
+% options = spot_sdp_default_options();
+% options.verbose=0;
+% sol=prog.minimize(-0,@spot_mosek,options);
+% V3=sol.eval(V);
+% time3=toc;
 
-time=time1+time2+time3;
+% time=time1+time2+time3;
 end
 
 
