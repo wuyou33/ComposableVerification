@@ -1,24 +1,25 @@
-function [all_A, avg_lumped_time]=Random_A_Matrices(n,blk_size,num_samples)
-% parameters
+function avg_time=original_LMI(n,blk_size,num_samples)
+% options
 direct_eigen_cal_on = false;
+save_samples=true;
 A_option = 'sparse_A';
 % A_option = 'dense_A';
 
 num_blks=n/blk_size;
-all_A=zeros(n,n,num_samples);
-if strcmp(A_option, 'sparse_A')
-    density=.2;
-    A=sprand(n,n,density)-5*eye(n);
-elseif strcmp(A_option, 'dense_A')
-    A=randn(n,n);
-end
-
 cvx_status='s';
 sample_counter=0;
-lumped_total_time=0;
-all_A={};
+total_time=0;
+sample_A={};
+
 while (sample_counter<num_samples)
-    tic
+    if strcmp(A_option, 'sparse_A')
+        density=.3;
+        A=sprand(n,n,density)-5*eye(n);
+    elseif strcmp(A_option, 'dense_A')
+        A=randn(n,n);
+    end
+
+ 
     cvx_begin sdp quiet
     cvx_solver Mosek
     variable P_i(blk_size,blk_size,num_blks) hermitian semidefinite
@@ -27,21 +28,28 @@ while (sample_counter<num_samples)
     subject to
     blkd_P >= 1e-7*eye(n)
     blkd_P*A+A'*blkd_P <= -1e-7*eye(n)
+    tic
     cvx_end
-    lump=toc;
+    this_time=toc;
     if (strcmp(cvx_status,'Solved'))% the lumped version is successful
         sample_counter=sample_counter+1;
-        all_A(sample_counter)={A};
+        sample_A(sample_counter)={A};
+        total_time=total_time+this_time;
     end
-    lumped_total_time=lumped_total_time+lump;
-end
-avg_lumped_time=lumped_total_time/num_samples;
-
-Asize=num2str(n);
-ABlkSize=num2str(blk_size);
-save(strcat('A_','size_',Asize,'BlkSize_',ABlkSize,'num_samples_',num_samples,'.mat'),'all_A');
 end
 
+avg_time=total_time/num_samples
+
+if save_samples
+    Asize=num2str(n);
+    ABlkSize=num2str(blk_size);
+    save(strcat('A_','size_',Asize,'BlkSize_',ABlkSize,'num_samples_',num_samples,'.mat'),'sample_A');
+end
+
+[ricatti_succ_count, avg_Riccati_time] = Ricaati_eqns(sample_A)
+sparse_time = sparse_LMIs(sample_A)
+
+end
 
 % testing direct eigenvalue based methods
 function eigen_time=direct_eigen_cal(A)
@@ -50,6 +58,7 @@ find(real(eig(A))<0);
 eigen_time=toc;
 end
 
+% conjecture testing
 % function testing_arrows(A)
 % n=size(A,1);
 % for i =1:n
@@ -62,6 +71,3 @@ end
 %     disp(difference)
 % end
 % end
-
-
-    
